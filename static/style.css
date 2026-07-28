@@ -1,0 +1,169 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(180deg, #207fae 0%, #54b4e1 75%);
+    color: rgb(255, 255, 255);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.container {
+    width: 30%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 29px;
+    margin-bottom: 8px;
+}
+
+h2 {
+    font-size: 20px;
+    color: #9fb8c2
+    margin: 28px 0 16px;
+    font-weight: 500;
+}
+
+.total-display {
+    margin: 16px 0;
+}
+
+.total-number {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    color: white;
+}
+
+
+.total-label {
+    font-size: 20px;
+    color: #9fb8c2
+    margin-top: 4px;
+}
+
+.bottle-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top 16px;
+}
+
+#waterFill {
+    transition: y 0.5s ease, height 0.5s ease, fill 0.3s ease;
+}
+
+.custom-btn-centered {
+    width: 100%;
+    margin-top: 28px;
+}
+
+.goal-label {
+    font-size: 20px;
+    color: #9fb8c2
+    margin-top: 8px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.amount-btn {
+    background: #1c3a47;
+    color:white;
+    border: 2px solid #2c5063;
+    border-radius: 50px; 
+    padding: 15px 5px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.amount-btn:active {
+    transform: scale(0.96);
+    background: #2c5063;
+}
+
+.custom-input-wrap {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.custom-input-wrap.hidden {
+    display: none;
+}
+
+#customAmount {
+    flex: 1;
+    padding: 20px;
+    border-radius: 50px;
+    border: 2px solid #2c5063
+    background: #0B1F2A
+    color: white;
+    font-size: 15px;
+}
+
+#customSubmit {
+    background: #3fe0a5
+    color: #0b1f2a
+    border: none; 
+    border-radius: 50px;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.confirmation {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #3fe0a5
+    font-weight: 600;
+}
+
+.confirmation.hidden {
+    display: none;
+}
+
+.utility-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.utility-btn {
+    flex: 1;
+    background: rgba(11, 31, 42, 0.35);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.utility-btn:active {
+    background: rgba(11,31,42,0.55);
+    transform: scale(0.96);
+}
+
+

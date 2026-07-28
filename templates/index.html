@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Water Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+       <h1> Water Tracker </h1>
+
+       <div class="total-display">
+            <div class="total-number" id="totalNumber">{{ today_total | int}}</div>
+            <div class="total-label">oz today</div>
+       </div>
+
+       <div class="bottle-wrap">
+        <svg width="90" height="200" viewBox="0 0 90 200">
+            <defs>
+                <clipPath id="bottleClip">
+                    <path d="M32,8 L58,8 L58,28 C58,28 70,38 70,55 L70,185 C70,193 63,198 55,198 L35,198 C27,198 20,193 20,185 L20,55 C20,38 32,28 32,28 Z"/>   
+                </clipPath>
+            </defs>
+            <path d="M32,8 L58,8 L58,28 C58,28 70,38 70,55 L70,185 C70,193 63,198 55,198 L35,198 C27,198 20,193 20,185 L20,55 C20,38 32,28 32,28 Z"
+                   fill="#1c3a47" stroke="#2c5063" stroke-width="2"/>
+            <rect id="waterFill" x="20" y="198" width="50" height="0" fill="#4fa8d8" clip-path="url(#bottleClip)"></rect>
+            <rect x="30" y="0" width="30" height="10" rx="2" fill="#2c5063"></rect>
+        </svg>
+       </div>
+       <div class="goal-label" id="goalLabel">Goal: {{ goal }} oz</div>
+
+       <h2>Add oz of water</h2>
+
+       <div class="button-grid">
+            <button class="amount-btn" data-amount="4">4 oz</button>
+            <button class="amount-btn" data-amount="8">8 oz</button>
+            <button class="amount-btn" data-amount="12">12 oz</button>
+            <button class="amount-btn" data-amount="16">16 oz</button>
+            <button class="amount-btn" data-amount="20">20 oz</button>
+            <button class="amount-btn" data-amount="24">24 oz</button>
+       </div>
+
+       <button class="amount-btn custom-btn-centered" id="customBtn">Custom</button>
+
+       <div id="customInputWrap" class="custom-input-wrap hidden">
+            <input type="number" id="customAmount" placeholder="Amount in oz" inputmode="numeric">
+            <button id="customSubmit">Log it</button>
+        </div>
+
+        <div id="confirmation" class = "confirmation hidden">Logged! </div>
+
+        <div class="utility-buttons">
+            <button id="undoBtn" class="utility-btn"><i class="ti ti-arrow-back-up"></i> Undo Last</button>
+            <button id="resetBtn" class="utility-btn"><i class="ti ti-refresh"></i>Reset</button>
+        </div>
+
+    </div>
+
+    <script>
+        const totalNumber = document.getElementById('totalNumber');
+        const progressBar = document.getElementById('progressBar');
+        const confirmation = document.getElementById('confirmation');
+        const customBtn = document.getElementById('customBtn');
+        const customInputWrap = document.getElementById('customInputWrap');
+        const customAmount = document.getElementById('customAmount');
+        const customSubmit = document.getElementById('customSubmit');
+        const undoBtn = document.getElementById('undoBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        async function logWater(amountOz) {
+            try {
+                const response = await fetch('/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount_oz: amountOz })
+                })
+                const data = await response.json();
+
+                if (data.success) {
+                    totalNumber.textContent = Math.round(data.today_total);
+                    updateBottle(data.progress_pct);
+                    showConfirmation();
+                }
+            } catch (err) {
+                alert('Could not log water. Check your connection.');
+            }
+        }
+
+        function showConfirmation() {
+            confirmation.classList.remove('hidden');
+            setTimeout(() => confirmation.classList.add('hidden'), 1500);
+
+        }
+
+        function updateBottle(progressPct) {
+            const fill = document.getElementById('waterFill');
+            const maxHeight = 190;
+            const h = (progressPct / 100) * maxHeight;
+            fill.setAttribute('y', 198 - h);
+            fill.setAttribute('height', h);
+            fill.setAttribute('fill', progressPct >= 100 ? '#3fe0a5' : '#4fa8d8');
+        }
+        
+        document.querySelectorAll('.amount-btn[data-amount]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amount = parseFloat(btn.dataset.amount);
+                logWater(amount);
+            });
+        });
+
+        customBtn.addEventListener('click', () => {
+            customInputWrap.classList.toggle('hidden');
+            customAmount.focus();
+        });
+
+        customSubmit.addEventListener('click', () => {
+            const amount = parseFloat(customAmount.value);
+            if (amount > 0) {
+                logWater(amount);
+                customAmount.value = '';
+                customInputWrap.classList.add('hidden');
+            }
+        });
+
+        undoBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/undo', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    totalNumber.textContent = Math.round(data.today_total);
+                    updateBottle(data.progress_pct);
+                }
+            } catch (err) {
+                alert('Could not undo. Check your connection.');
+            }
+        });
+
+        resetBtn.addEventListener ('click', async() => {
+            const confirmed = confirm('Reset all of today\'s water log to 0?');
+            if (!confirmed) return;
+
+            try{
+                const response = await fetch('/reset', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    totalNumber.textContent = Math.round(data.today_total);
+                    updateBottle(data.progress_pct);
+                }
+            } catch (err) {
+                alert('Could not reset. Check your connection.');
+            }
+        });
+
+        updateBottle({{ progress_pct }});
+
+        </script>
+</body>
+</html>
